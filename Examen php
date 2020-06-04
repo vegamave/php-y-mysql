@@ -1,0 +1,109 @@
+<?php 
+    include('php_bbdd.php');
+    $update = false; 
+    if (isset($_GET['edit'])) {
+        $id = $_GET['edit'];
+        $update = true;
+        $record = mysqli_query($db, "SELECT * FROM productos WHERE id = $id");
+        if (mysqli_num_rows($record) == 1 ) {
+            $producto = mysqli_fetch_array($record);
+            $nombre = $producto['nombre'];
+            $referencia = $producto['referencia'];
+            $activo = $producto['activo'];
+            $resumen = $producto['resumen'];
+            $descripcion = $producto['descripcion'];
+            $precio = $producto['precio_actual'];
+         }
+    }
+?>
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Alta de Productos</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="estilos/style.css">
+</head>
+<body> 
+
+<?php if (isset($_SESSION['mensaje'])): ?>
+    <div class="msg">
+    <?php
+        echo $_SESSION['mensaje'];
+        unset($_SESSION['mensaje']);
+    ?>
+    </div>
+<?php endif ?>
+
+<a href="clase9.php">Clase 9</a>
+
+<?php $productos = mysqli_query($db, "SELECT * FROM productos") ?>
+<table>
+    <thead>
+        <tr>
+            <th>Nombre</th>
+            <th>Referencia</th>
+            <th>Activo</th>
+            <th>Resumen</th>
+            <th>Precio</th>
+            <th>Precio Oferta</th>
+            <th colspan="2">Acciones</th>
+        </tr>
+    </thead>
+    <?php while ($producto = mysqli_fetch_array($productos)) { ?>
+        <tr>
+            <td><?php echo $producto['nombre'] ?></td>
+            <td><?php echo $producto['referencia'] ?></td>
+            <td><?php echo $producto['activo'] ?></td>
+            <td><?php echo $producto['resumen'] ?></td>
+            <td>$ <?php echo $producto['precio_original'] ?></td>
+            <td>$ <?php echo $producto['precio_actual'] ?></td>
+            <td>
+                <a href="index.php?edit=<?php echo $producto['id']; ?>" class="edit_btn"> Editar</a>
+            </td>
+            <td>
+                <a href="index.php?del=<?php echo $producto['id'] ?>" class="del_btn"> Borrar</a>
+            </td>
+        </tr>
+    <?php } ?>
+</table>
+
+
+<h1 class="titulo">Formulario de Alta de Productos</h1>
+<form class="formulario" method="post" action="php_bbdd.php">
+        <input type="hidden" name="id" value="<?php echo $id ?>">
+        <div class="campo">
+            <label for="nombre">Nombre</label>
+            <input type="text" id="nombre" name="nombre" maxlength="250" requiered value="<?php echo $nombre ?>">
+        </div>
+        <div class="campo">
+            <label for="referencia">Referencia</label>
+            <input type="text" id="referencia" name="referencia" maxlength="60" requiered value="<?php echo $referencia ?>">
+        </div>
+        <div class="campo">
+            <label for="activo">Activo </label>
+            <input type="checkbox" id="activo" name="activo" <?php if(isset($activo)) { ?> checked="<?php $activo ? true : false ?>" <?php } 
+            ?>>
+        </div>
+        <div class="campo">
+            <label for="resumen">Resumen</label>
+            <input type="text" id="resumen" name="resumen" maxlength="250" value="<?php echo $resumen ?>">
+        </div>
+        <div class="campo">
+            <label for="descripcion">Descripcion</label>
+            <input type="text" id="descripcion" name="descripcion" maxlength="1000" value="<?php echo $descripcion ?>">
+        </div>
+        <div class="campo">
+            <label for="precio">Precio</label>
+            <input type="number" id="precio" name="precio" requiered min="1" value="<?php echo $precio ?>">
+        </div>
+        <?php if($update == true): ?>
+            <button class="btn" type="submit" name="update" style="background; #556B2F">Actualizar</button>
+        <?php else: ?>
+            <button class="btn" type="submit" name="save">Crear</button>
+        <?php endif ?>
+    </form>
+</body>
+</html>
